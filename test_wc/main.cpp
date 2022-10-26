@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 
 /*
 We can't use order statistics algorithm (O(N)) by virtue of the assumption that available memory can't contain all input data.
@@ -20,11 +22,11 @@ ALSO try MinHeap based on array in the stack memory
 
 using namespace std;  //убрать в финальной версии
 
-class Entry {
-private:
+struct Entry {
 	int k;
 	int v;
-public:
+
+	Entry() = default;
 	Entry(int key, int value) : k(key), v(value) {};
 
 	bool operator<(Entry rhs) {
@@ -42,6 +44,16 @@ public:
 	}
 };
 
+/*Print Entry obj to cout*/
+ostream& operator<<(ostream& output, const Entry& e) {
+	output << "{" << e.k << ", " << e.v << "}" << endl;
+	return output;
+}
+
+// create Entity in heap memory and then move it to tree structure
+
+// probably better to use uint in some places  
+
 /*MinHeap data structure.
 Interface: 
 get_min() - return the root element;
@@ -51,30 +63,41 @@ change_root(T target_value)
 begin()
 end()
 */
-
-// create Entity in heap memory and then move it to tree structure
-
 template <typename T>
 class MinHeap {
 private:
-	T* _data;
+	T* _dataptr;
 	int _size;
 	int _capacity;
 public:
 	MinHeap() = default;
-	MinHeap(int capacity) : 
-		_capacity(capacity), _size(0), _data(new T[capacity]) 
-	{};
+	MinHeap(T a[], int capacity) : 
+		_capacity(capacity), _size(0)
+	{
+		_dataptr = a;
+	};
 	// is destructor needed?
 	/*
 	~MinHeap() {
-		delete _data;
+		delete _dataptr;
 	}
 	*/
 
-	// Return the minimum
-	T get_min() {
-		return *_data;
+	// Return the minimum (root)
+	T get_min() const {
+		return *_dataptr;
+	}
+
+	int get_size() const {
+		return _size;
+	}
+
+	void incr_size() {
+		++_size;
+	}
+
+	void set_root(T el) {
+		_dataptr[0] = el;
 	}
 
 	void heapify() {
@@ -85,6 +108,66 @@ public:
 
 };
 
-int main() {
+// Get Entry from cin
+ifstream& operator>>(ifstream& input, Entry& e) {
+	input >> e.v >> e.k;
+	return input;
+}
+
+/*
+Entry* GetXMax(int X) {
 	
+}
+*/
+
+// if X > number of given lines, we are not printing default objs
+void PrintXMax(int X, string fpath) {
+	ifstream infile(fpath);
+	Entry* earr = new Entry[X];
+	MinHeap mh(earr, X);
+	Entry tmp;
+	bool isFull = false;
+	while (infile >> tmp)
+	{
+		if (mh.get_size() < X) {
+			earr[mh.get_size()] = tmp;
+			// increase size somehow
+			mh.incr_size();
+		}
+		else if (!isFull) {
+			mh.heapify();
+			if (tmp > mh.get_min()) {
+				mh.set_root(tmp);
+			}
+			mh.heapify();
+			isFull = true;
+		}
+		else if (tmp > mh.get_min()) {
+			mh.set_root(tmp);
+			mh.heapify();
+		}
+	}
+	for (int i = 0; i < mh.get_size(); ++i) {
+		cout << earr[i] << endl;
+	}
+
+
+}
+
+// when printing try to use flush
+int main() {
+	Entry* ptr = nullptr;
+	{
+		int z = 100500;
+		Entry* a = new Entry[1000];
+		ptr = a;
+		MinHeap mh(a, 1000);
+		cout << a[0] << endl;
+		cout << a[999] << endl;
+	}
+
+	cout << ptr << endl;
+	cout << ptr[999] << endl;
+
+	PrintXMax(3, "D:\\fun\\Interviews\\tests\\wc\\test0.txt"s);
 }
