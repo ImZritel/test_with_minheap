@@ -30,14 +30,14 @@ struct Entry {
 	Entry(int key, int value) : k(key), v(value) {};
 
 	bool operator<(Entry rhs) {
-		if (v < rhs.v || (v == rhs.v && k < rhs.k)) {    // we have no need in comparing k, because there is no such task
+		if (v < rhs.v) {
 			return true;
 		}
 		return false;
 	}
 
 	bool operator>(Entry rhs) {
-		if (v > rhs.v || (v == rhs.v && k > rhs.k)) {
+		if (v > rhs.v) {
 			return true;
 		}
 		return false;
@@ -66,7 +66,7 @@ end()
 template <typename T>
 class MinHeap {
 private:
-	T* _dataptr;
+	T* _data;
 	int _size;
 	int _capacity;
 public:
@@ -74,46 +74,39 @@ public:
 	MinHeap(T a[], int capacity) : 
 		_capacity(capacity), _size(0)
 	{
-		_dataptr = a;
-	};
-	// is destructor needed?
-	/*
+		_data = a;
+	};	
 	~MinHeap() {
-		delete _dataptr;
+		delete _data;
 	}
-	*/
 
 	// Return the minimum (root)
-	T get_min() const {
-		return *_dataptr;
+	T get_root() const {
+		return *_data;
 	}
-
+	void set_root(T el) {
+		_data[0] = el;
+	}
 	int get_size() const {
 		return _size;
 	}
-
 	void incr_size() {
 		++_size;
 	}
 
-	void set_root(T el) {
-		_dataptr[0] = el;
-	}
-
-	// Adjust the subtree with root in i index to meet the definition of a MinHeap
+	// Adjust the subtree with root in i index to meet the definition of a MinHeap.
 	void heapify(int i) {
 		int min = i;
 		int left = 2 * i + 1;
 		int right = 2 * i + 2;
-		if (left < _size && _dataptr[min] > _dataptr[left]) {
+		if (left < _size && _data[min] > _data[left]) {
 			min = left;
 		}
-		if (right < _size && _dataptr[min] > _dataptr[right]) {
+		if (right < _size && _data[min] > _data[right]) {
 			min = right;
 		}
-
 		if (min != i) {
-			swap(_dataptr[i], _dataptr[min]);
+			swap(_data[i], _data[min]);
 			heapify(min);
 		}
 	}
@@ -124,9 +117,6 @@ public:
 			this->heapify(i);
 		}
 	}
-
-	//use make_heap??? - no, it creates MinHeap based on two given iterators. We have a stream and not a container.
-	
 };
 
 // Get Entry from cin
@@ -152,35 +142,19 @@ void PrintXMax(int X, string fpath) {
 	{
 		if (mh.get_size() < X) {
 			earr[mh.get_size()] = tmp;
-			// increase size somehow
 			mh.incr_size();
-
-			cout << "tmp = " << tmp << endl;
-			for (int i = 0; i < X; ++i) {
-				cout << "earr[" << i << "] = " << earr[i] << endl;
-			}
 		}
 		else if (!isFull) {
 			mh.build_heap();
-			if (tmp > mh.get_min()) {
+			if (tmp > mh.get_root()) {
 				mh.set_root(tmp);
 			}
 			mh.heapify(0);
 			isFull = true;
-
-			cout << "tmp = " << tmp << endl;
-			for (int i = 0; i < X; ++i) {
-				cout << "earr[" << i << "] = " << earr[i] << endl;
-			}
 		}
-		else if (tmp > mh.get_min()) {
+		else if (tmp > mh.get_root()) {
 			mh.set_root(tmp);
 			mh.heapify(0);
-
-			cout << "tmp = " << tmp << endl;
-			for (int i = 0; i < X; ++i) {
-				cout << "earr[" << i << "] = " << earr[i] << endl;
-			}
 		}
 	}
 	for (int i = 0; i < mh.get_size(); ++i) {
@@ -203,5 +177,5 @@ int main() {
 	cout << ptr << endl;
 	cout << ptr[999] << endl;
 
-	PrintXMax(15, "D:\\fun\\Interviews\\tests\\wc\\test2.txt"s);
+	PrintXMax(500, "D:\\fun\\Interviews\\tests\\wc\\test2.txt"s);
 }
