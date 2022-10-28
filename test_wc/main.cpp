@@ -80,6 +80,17 @@ public:
 		delete _data;
 	}
 
+	// ¬озвращает итератор на начало массива
+	// ƒл€ пустого массива может быть равен (или не равен) nullptr
+	T* begin() noexcept {
+		return _data;
+	}
+	// ¬озвращает итератор на элемент, следующий за последним
+	// ƒл€ пустого массива может быть равен (или не равен) nullptr
+	T* end() noexcept {
+		return _data + _size;
+	}
+
 	// Return the minimum (root)
 	T get_root() const {
 		return *_data;
@@ -132,7 +143,7 @@ Entry* GetXMax(int X) {
 */
 
 // if X > number of given lines, we are not printing default objs
-void PrintXMax(int X, string fpath) {
+int* GetXMax(int X, string fpath) {
 	ifstream infile(fpath);
 	Entry* earr = new Entry[X];
 	MinHeap mh(earr, X);
@@ -157,25 +168,26 @@ void PrintXMax(int X, string fpath) {
 			mh.heapify(0);
 		}
 	}
-	for (int i = 0; i < mh.get_size(); ++i) {
-		cout << earr[i] << endl;
+
+	int* karr = new int[mh.get_size()];
+	int i = 0;
+	// Forming output array of keys.
+	for (auto node : mh) {
+		karr[i] = node.k;
+		++i;
 	}
+	return karr;
 }
 
 // when printing try to use flush
 int main() {
-	Entry* ptr = nullptr;
-	{
-		int z = 100500;
-		Entry* a = new Entry[1000];
-		ptr = a;
-		MinHeap mh(a, 1000);
-		cout << a[0] << endl;
-		cout << a[999] << endl;
+	int X;
+	cout << "Please enter the required number of entries(X): "s;
+	cin >> X;
+	cout << endl;
+	int* result = GetXMax(X, "D:\\fun\\Interviews\\tests\\wc\\test0.txt"s);
+
+	for (int i = 0; i < X; ++i) {
+		cout << result[i] << endl;
 	}
-
-	cout << ptr << endl;
-	cout << ptr[999] << endl;
-
-	PrintXMax(500, "D:\\fun\\Interviews\\tests\\wc\\test2.txt"s);
 }
