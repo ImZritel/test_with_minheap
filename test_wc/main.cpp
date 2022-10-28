@@ -100,17 +100,38 @@ public:
 		_dataptr[0] = el;
 	}
 
-	void heapify() {
-		
+	// Adjust the subtree with root in i index to meet the definition of a MinHeap
+	void heapify(int i) {
+		int min = i;
+		int left = 2 * i + 1;
+		int right = 2 * i + 2;
+		if (left < _size && _dataptr[min] > _dataptr[left]) {
+			min = left;
+		}
+		if (right < _size && _dataptr[min] > _dataptr[right]) {
+			min = right;
+		}
+
+		if (min != i) {
+			swap(_dataptr[i], _dataptr[min]);
+			heapify(min);
+		}
+	}
+
+	// Build min heap on current data.
+	void build_heap() {
+		for (int i = _size / 2; i >= 0; --i) {
+			this->heapify(i);
+		}
 	}
 
 	//use make_heap??? - no, it creates MinHeap based on two given iterators. We have a stream and not a container.
-
+	
 };
 
 // Get Entry from cin
 ifstream& operator>>(ifstream& input, Entry& e) {
-	input >> e.v >> e.k;
+	input >> e.k >> e.v;
 	return input;
 }
 
@@ -133,25 +154,38 @@ void PrintXMax(int X, string fpath) {
 			earr[mh.get_size()] = tmp;
 			// increase size somehow
 			mh.incr_size();
+
+			cout << "tmp = " << tmp << endl;
+			for (int i = 0; i < X; ++i) {
+				cout << "earr[" << i << "] = " << earr[i] << endl;
+			}
 		}
 		else if (!isFull) {
-			mh.heapify();
+			mh.build_heap();
 			if (tmp > mh.get_min()) {
 				mh.set_root(tmp);
 			}
-			mh.heapify();
+			mh.heapify(0);
 			isFull = true;
+
+			cout << "tmp = " << tmp << endl;
+			for (int i = 0; i < X; ++i) {
+				cout << "earr[" << i << "] = " << earr[i] << endl;
+			}
 		}
 		else if (tmp > mh.get_min()) {
 			mh.set_root(tmp);
-			mh.heapify();
+			mh.heapify(0);
+
+			cout << "tmp = " << tmp << endl;
+			for (int i = 0; i < X; ++i) {
+				cout << "earr[" << i << "] = " << earr[i] << endl;
+			}
 		}
 	}
 	for (int i = 0; i < mh.get_size(); ++i) {
 		cout << earr[i] << endl;
 	}
-
-
 }
 
 // when printing try to use flush
@@ -169,5 +203,5 @@ int main() {
 	cout << ptr << endl;
 	cout << ptr[999] << endl;
 
-	PrintXMax(3, "D:\\fun\\Interviews\\tests\\wc\\test0.txt"s);
+	PrintXMax(15, "D:\\fun\\Interviews\\tests\\wc\\test2.txt"s);
 }
