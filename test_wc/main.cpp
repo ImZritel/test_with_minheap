@@ -35,10 +35,6 @@ std::ostream& operator<<(std::ostream& output, const Entry& e) {
 	return output;
 }
 
-// create Entity in heap memory and then move it to tree structure
-
-// probably better to use uint in some places  
-
 /*MinHeap data structure.
 Interface: 
 get_min() - return the root element;
@@ -65,18 +61,16 @@ public:
 		delete _data;
 	}
 
-	// ¬озвращает итератор на начало массива
-	// ƒл€ пустого массива может быть равен (или не равен) nullptr
+	// Return pointer begin of the array.
 	T* begin() noexcept {
 		return _data;
 	}
-	// ¬озвращает итератор на элемент, следующий за последним
-	// ƒл€ пустого массива может быть равен (или не равен) nullptr
+	// Rturn pointer to the element next to the end one.
 	T* end() noexcept {
 		return _data + _size;
 	}
 
-	// Return the minimum (root)
+	// Return the minimum (root) node.
 	T get_root() const {
 		return *_data;
 	}
@@ -90,7 +84,10 @@ public:
 		++_size;
 	}
 
-	// Adjust the subtree with root in i index to meet the definition of a MinHeap.
+	/* Adjust the subtree with root in i index to meet the definition of a MinHeap.
+	* Time complexity: O(log N) where N - number of tree elements.
+	* Space: O(1).
+	*/
 	void heapify(int i) {
 		int min = i;
 		int left = 2 * i + 1;
@@ -107,7 +104,10 @@ public:
 		}
 	}
 
-	// Build min heap on current data.
+	/* Build min heap on current data.
+	* Time complexity: O(N * log N) where N - number of tree elements.
+	* Space: O(1).
+	*/
 	void build_heap() {
 		for (int i = _size / 2; i >= 0; --i) {
 			this->heapify(i);
@@ -115,12 +115,17 @@ public:
 	}
 };
 
-// Get Entry from cin
+/* Get Entry from cin.*/
 std::istream& operator>>(std::istream& input, Entry& e) {
 	input >> e.k >> e.v;
 	return input;
 }
 
+/* Return vector with X (or less if not given enough) maximum entries IDs.
+* Read data from cin.
+* Time complexity: O(K *log K + (N-K)*log(K)) where K - number of minheap elements, N - number of given entries.
+* Space: O(K)
+*/
 std::vector<int> GetXMax(int X) {
 	Entry* earr = new Entry[X];
 	MinHeap mh(earr, X);
@@ -155,7 +160,11 @@ std::vector<int> GetXMax(int X) {
 	return karr;
 }
 
-// if X > number of given lines, we are not printing default objs
+/* Return vector with X (or less if not given enough) maximum entries IDs.
+* Read data from the file.
+* Time complexity: O(K *log K + (N-K)*log(K)) where K - number of minheap elements, N - number of given entries.
+* Space: O(K)
+*/
 std::vector<int> GetXMax(int X, std::string fpath) {
 	std::ifstream infile(fpath);
 	Entry* earr = new Entry[X];
@@ -191,10 +200,14 @@ std::vector<int> GetXMax(int X, std::string fpath) {
 	return karr;
 }
 
-
+/* Little macro for tests.
+* res - result;
+* X - size of result;
+* p - set of possible valid entries.
+*/
 #define TEST_RESULT(res, X, p) TestResult((res), (X), (p), #res, #p, __FILE__, __FUNCTION__, __LINE__, ""s)
 
-// Reads X and file path or stream data, runs the logic, prints output in std::cin.
+/* Reads Xand file path or stream data, runs the logic, prints output in std::cin.*/
 void ReadRunPrint() {
 	// Read parameters.
 	int X;
