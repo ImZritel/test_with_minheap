@@ -1,27 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <set>
 
-/*
-We can't use order statistics algorithm (O(N)) by virtue of the assumption that available memory can't contain all input data.
+#include "testing.h"
 
-algorithm:
-while there is values in stream:
-0. read key, value from file stream to new structure Entry. Entry has constructor and operator>.
-1. if MinHeap.size() < X || entry > MinHeap[0], add entry and rearrange MinHeap (should I fill all MinHeap object in constructor with nown minimum value?) 
-return MinHeap object.
-
-Needed:
-MinHeap class (constructor, add(add to the end and rearrange), swap_root(Entity, MinHeap[0])l);
-Entry class (constructor, operator>)
-
-ALSO try MinHeap based on array in the stack memory
-
-*/
-
-
-using namespace std;  //убрать в финальной версии
-
+/* Represents one given entry.*/
 struct Entry {
 	int k;
 	int v;
@@ -45,8 +30,8 @@ struct Entry {
 };
 
 /*Print Entry obj to cout*/
-ostream& operator<<(ostream& output, const Entry& e) {
-	output << "{" << e.k << ", " << e.v << "}" << endl;
+std::ostream& operator<<(std::ostream& output, const Entry& e) {
+	output << "{"s << e.k << ", "s << e.v << "}"s << std::endl;
 	return output;
 }
 
@@ -117,7 +102,7 @@ public:
 			min = right;
 		}
 		if (min != i) {
-			swap(_data[i], _data[min]);
+			std::swap(_data[i], _data[min]);
 			heapify(min);
 		}
 	}
@@ -131,20 +116,48 @@ public:
 };
 
 // Get Entry from cin
-ifstream& operator>>(ifstream& input, Entry& e) {
+std::istream& operator>>(std::istream& input, Entry& e) {
 	input >> e.k >> e.v;
 	return input;
 }
 
-/*
-Entry* GetXMax(int X) {
+std::vector<int> GetXMax(int X) {
+	Entry* earr = new Entry[X];
+	MinHeap mh(earr, X);
+	Entry tmp;
+	bool isFull = false;
+	while (std::cin >> tmp)
+	{
+		if (mh.get_size() < X) {
+			earr[mh.get_size()] = tmp;
+			mh.incr_size();
+		}
+		else if (!isFull) {
+			mh.build_heap();
+			if (tmp > mh.get_root()) {
+				mh.set_root(tmp);
+			}
+			mh.heapify(0);
+			isFull = true;
+		}
+		else if (tmp > mh.get_root()) {
+			mh.set_root(tmp);
+			mh.heapify(0);
+		}
+	}
 	
+	// Forming output array of keys.
+	std::vector<int> karr;
+	karr.reserve(mh.get_size());
+	for (auto node : mh) {
+		karr.push_back(node.k);
+	}
+	return karr;
 }
-*/
 
 // if X > number of given lines, we are not printing default objs
-int* GetXMax(int X, string fpath) {
-	ifstream infile(fpath);
+std::vector<int> GetXMax(int X, std::string fpath) {
+	std::ifstream infile(fpath);
 	Entry* earr = new Entry[X];
 	MinHeap mh(earr, X);
 	Entry tmp;
@@ -169,25 +182,66 @@ int* GetXMax(int X, string fpath) {
 		}
 	}
 
-	int* karr = new int[mh.get_size()];
-	int i = 0;
-	// Forming output array of keys.
+	// Forming output vector of keys.
+	std::vector<int> karr;
+	karr.reserve(mh.get_size());
 	for (auto node : mh) {
-		karr[i] = node.k;
-		++i;
+		karr.push_back(node.k);
 	}
 	return karr;
 }
 
-// when printing try to use flush
-int main() {
-	int X;
-	cout << "Please enter the required number of entries(X): "s;
-	cin >> X;
-	cout << endl;
-	int* result = GetXMax(X, "D:\\fun\\Interviews\\tests\\wc\\test0.txt"s);
 
-	for (int i = 0; i < X; ++i) {
-		cout << result[i] << endl;
+#define TEST_RESULT(res, X, p) TestResult((res), (X), (p), #res, #p, __FILE__, __FUNCTION__, __LINE__, ""s)
+
+// Reads X and file path or stream data, runs the logic, prints output in std::cin.
+void ReadRunPrint() {
+	// Read parameters.
+	int X;
+	std::cout << "Please enter the required number of entries(X): "s;
+	std::cin >> X;
+	//cout << endl;
+	char FileInputYN;
+	std::cout << "Read data from file? (Y/N): "s;
+	std::cin >> FileInputYN;
+	//cout << endl;
+
+	// Run logic.
+	std::vector<int> result;
+	result.reserve(X);
+	if (FileInputYN == 'Y' || FileInputYN == 'y') {
+		std::cout << "Please enter the file path: "s;
+		std::string fPath = ""s;
+		std::cin >> fPath;
+		std::cout << std::endl;
+		result = GetXMax(X, fPath);
 	}
+	else if (FileInputYN == 'N' || FileInputYN == 'n') {
+		std::cout << "Please enter the data: "s << std::endl;
+		result = GetXMax(X);
+	}
+
+	// Print result (if any).
+	if (!result.empty()) {
+		for (int i = 0; i < X; ++i) {
+			std::cout << result[i] << "\n"s;
+		}
+		std::cout << std::flush;
+	}
+}
+
+int main() {
+	// Some relevant values occur twice.
+	std::set<int> p0{ 1000000005, 1000000006, 1000000007, 1000000008, 1000000009 };
+	TEST_RESULT(GetXMax(4, "test0.txt"s), 4, p0);
+
+	// X > number of entries.
+	std::set<int> p1{ 1000000000, 1000000001, 1000000002, 1000000003, 1000000004 };
+	TEST_RESULT(GetXMax(10, "test1.txt"s), 10, p1);
+
+	// X < number of entries having maximum value.
+	std::set<int> p2{ 1000000004, 1000000005, 1000000006, 1000000007, 1000000008, 1000000009 };
+	TEST_RESULT(GetXMax(3, "test2.txt"s), 4, p2);
+
+	ReadRunPrint();
 }
