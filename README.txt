@@ -1,5 +1,5 @@
 BUILD:
-g++ -o main.exe main.cpp -std=c++17 -static-libstdc++ -static-libgcc -static -O2
+g++ -o main.exe main.cpp -std=c++17 -O2
 
 COMMENT ON LOGIC:
 The solution uses "Min Heap" data structure.

@@ -6,6 +6,8 @@
 
 #include "testing.h"
 
+using namespace std::string_literals;
+
 /* Represents one given entry.*/
 struct Entry {
 	int k;
@@ -35,15 +37,7 @@ std::ostream& operator<<(std::ostream& output, const Entry& e) {
 	return output;
 }
 
-/*MinHeap data structure.
-Interface: 
-get_min() - return the root element;
-add(T target_value) - in what place in tree?
-heapify()
-change_root(T target_value)
-begin()
-end()
-*/
+/*MinHeap data structure.*/
 template <typename T>
 class MinHeap {
 private:
